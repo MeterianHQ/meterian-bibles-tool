@@ -7,7 +7,7 @@ Use this script to generate a licenses bible, in JSON format, comprehensive of a
 First of all run `pipenv install --python 3` to setup the virtual environment.
 **This script only works with python3**
 
-Then launch the generator `pipenv run python generate_bible.py [OPT]`
+Then launch the generator `pipenv run python generate_bible.py [Options]`
 
 ## The script option
 |Option|Required|Description|
