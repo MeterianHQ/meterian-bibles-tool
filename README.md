@@ -27,6 +27,3 @@ The `_status` field indicates whether all the bibles were processed.
 `"_status": "partial"` indicates that the script was not able to process one or more bibles
 
 The `components` field contains all the components, with respective liceses, categorized by language.
-```
-{}
-```
