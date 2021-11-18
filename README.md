@@ -2,7 +2,7 @@
 
 Use this script to generate a licenses bible, in JSON format, comprehensive of all the bibles of all the projects bound to a tag.
 
-## You will need a token to use these tools!
+## You will need a token to use this tool!
 
 This tool will require an API token from Meterian. This is available for any paid plan, and it can be generated from the "Tokens" tab at https://meterian.com/dashboard 
 
