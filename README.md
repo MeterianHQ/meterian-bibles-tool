@@ -21,9 +21,16 @@ Then launch the generator `pipenv run python generate_bible.py [Options]`
 The output file presents two sections:
 - _status
 - components
+- licenses
 
 The `_status` field indicates whether all the bibles were processed. 
-`"_status": "ok"` indicates that all the bibles were generated.
+`"_status": "ok"` indicates that all the bibles were processed correctly
 `"_status": "partial"` indicates that the script was not able to process one or more bibles
 
+<<<<<<< HEAD
 The `components` field contains all the components, with respective liceses, categorized by language.
+=======
+The `components` section contains all the components, with respective licenses, categorized by language.
+
+The `licenses` section contains all the licenses listed in all the processed bibles.
+>>>>>>> Now BiblesMerger also merges 'licenses' section
