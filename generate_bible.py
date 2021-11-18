@@ -34,13 +34,11 @@ def apply_logging_settings():
 
 def parse_args(args):
     global tag
-    global meterian_token
     global output
     global env
     global log_level
 
     tag=None
-    meterian_token=None
     output=None
     env="www"
     log_level = "INFO"
@@ -49,16 +47,7 @@ def parse_args(args):
         if "--tag=" in arg:
             arg=arg.split("=")
             tag = arg[1]
-            if len(tag)==0:
-                print("Tag not specified. Use `--tag=$TAG` to specify a tag.")
-                sys.exit(1)
-
-        if "--meterian-token=" in arg:
-            arg=arg.split("=")
-            meterian_token = arg[1]
-            if len(meterian_token)==0:
-                print("Meterian API Token not specified. Use `--meterian-token=$METERIAN_API_TOKEN` to specify the Meterian API Token.")
-                sys.exit(1)
+            
 
         if "--output=" in arg:
             arg=arg.split("=")
@@ -72,14 +61,31 @@ def parse_args(args):
 
         if "--debug" in arg:
             log_level="DEBUG"
+
+    if tag==None or len(tag)==0:
+        print("Tag not specified. Use `--tag=$TAG` to specify a tag.")
+        sys.exit(1)
         
     if output == None or len(output) == 0:
         output=os.path.join("/tmp","meterian."+tag+".bible.json")
         print("No output has been specified. The bible will be created @ "+output)
 
+def parse_env_variables(vars):
+    global meterian_token
+    try:
+        meterian_token = vars["METERIAN_API_TOKEN"]
+    except:
+        print("Meterian API Token not specified. Export METERIAN_API_TOKEN as environment variable.")
+        sys.exit(1)
+
+    if meterian_token == None or len(meterian_token)==0:
+        print("Meterian API Token not specified. Export METERIAN_API_TOKEN as environment variable.")
+        sys.exit(1)
+
 if __name__ == "__main__":
     print("Meterian - Bibles Tool")
     print()
+    parse_env_variables(os.environ)
     parse_args(sys.argv)
     apply_logging_settings()
     print()
