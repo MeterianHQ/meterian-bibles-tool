@@ -1,5 +1,7 @@
 import requests
 import json
+import logging
+log=logging.getLogger("ProjectsGetter")
 
 class ProjectsGetter:
     def __init__(self, meterian_token, env="www"):
@@ -15,14 +17,18 @@ class ProjectsGetter:
         return tag_info["projects"]
 
     def get_project_info(self, uuid):
-        print("Getting info for project "+uuid)
-        request = requests.get("https://"+self.env+".meterian.io/api/v1/reports/"+uuid+"/full",headers={"Authorization": "token "+self.meterian_token})
+        request = requests.get("https://"+self.env+".meterian.io/api/v1/projects/"+uuid,headers={"Authorization": "token "+self.meterian_token})
         if request.status_code != 200:
-            raise ValueError("Could not get download key for project "+uuid)
-        report = request.json()
-        return {
-            "download_key": report["downloadKey"],
-            "uuid": uuid,
-            "branch": report["project"]["branch"]
-        }
+            log.debug(request.text)
+            raise ValueError("Could not get info for project "+uuid)
+        project_info = request.json()
+        return project_info
+
+    def parse_project_url(self, project_info):
+        project_url = project_info["url"].split("?")[0]
+        if ":" in project_url:
+            project_url = project_url.split(":")[1]
+
+        return project_url
+    
 

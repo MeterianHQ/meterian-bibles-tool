@@ -2,6 +2,7 @@ import requests
 from datetime import  datetime
 import time
 import logging
+import traceback
 
 import json
 
@@ -46,33 +47,38 @@ class BiblesGetter:
     def get_all(self, projects):
         bibles = []
         full = True
-        for project in projects:
+        counter = 1
+        for uuid in projects:
             try:
-                print("Getting licenses bible for project "+ project)
-                gen_id = self.ask_bible_generation(project)
+                print("Project %s of %s" % (counter, len(projects)))
+                counter+=1
+                project_info = self.project_getter.get_project_info(uuid)
+                project_url = self.project_getter.parse_project_url(project_info)
+                gen_id = self.ask_bible_generation(uuid)
                 ready = False
                 wait_feedback = "       "
                 i=0
                 while not ready:
                     if wait_feedback==". . . . ":
                         wait_feedback= "       "
-                    print("Waiting for bible content to be generated "+project+wait_feedback, end="\r")
+                    print("Waiting for bible content to be generated "+project_url+wait_feedback, end="\r")
                     if wait_feedback == "       ":
                         wait_feedback= ""
                     wait_feedback+=". "
                     i+=1
                     if i==15:
-                        ready = self.ask_bible_status(project, gen_id)
+                        ready = self.ask_bible_status(uuid, gen_id)
                         i=0
                     time.sleep(1)
                 print()
-                bible = self.get_bible(project)
+                bible = self.get_bible(uuid)
                 bibles.append(bible)
-                print("Project "+project+" done")
+                print("Project "+project_url+" done")
                 print()
             except Exception as e:
-                print("Project "+project+" skipped. Bible will be incomplete.")
+                print("Project skipped. Bible will be incomplete.")
                 print(e)
+                traceback.print_exc()
                 print()
                 full = False
                 continue
