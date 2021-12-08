@@ -13,6 +13,7 @@ jobs:
             uses: MeterianHQ/meterian-github-action@autofix-prs-and-issues
             env:
               GITHUB_TOKEN: ${{ github.token }}
+              CLIENT_CANARY_FLAG: "--canary"
             with:
                 oss: true
                 autofix: conservative+vulns,safe+all
