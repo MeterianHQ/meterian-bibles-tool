@@ -16,7 +16,8 @@ jobs:
               CLIENT_CANARY_FLAG: "--canary"
             with:
                 oss: true
-                autofix: conservative+vulns,safe+all
-                autofix_issue_branches: "master"
+                autofix_security: conservative
+                autofix_stability: safe
+                autofix_with_report: true
                 cli_args: --report-console:licensing
 
