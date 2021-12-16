@@ -19,5 +19,5 @@ jobs:
                 autofix_security: conservative
                 autofix_stability: safe
                 autofix_with_report: true
-                cli_args: --report-console:licensing
+                cli_args: --report-console:licensing --debug
 
