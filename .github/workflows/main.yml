@@ -10,10 +10,9 @@ jobs:
           - name: Checkout
             uses: actions/checkout@v2
           - name: Scan project with the Meterian client
-            uses: MeterianHQ/meterian-github-action@autofix-prs-and-issues
+            uses: MeterianHQ/meterian-github-action@v1.0.9
             env:
               GITHUB_TOKEN: ${{ github.token }}
-              CLIENT_CANARY_FLAG: "--canary"
             with:
                 oss: true
                 autofix_security: conservative
