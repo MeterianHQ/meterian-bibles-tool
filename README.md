@@ -1,42 +1,13 @@
-# Meterian Bibles Merger Tool
+# Tool to lookup details among reports of a Meterian account
 
-Use this script to generate a licenses bible, in JSON format, comprehensive of all the bibles of all the projects bound to a tag.
+# Usage example
 
-## You will need a token to use this tool!
-
-This tool will require an API token from Meterian. This is available for any paid plan, and it can be generated from the "Tokens" tab at https://meterian.com/dashboard 
-
-Once you have the token, the best and secure way to use it is to put it into an environment variable, called METERIAN_API_TOKEN. In linux, for example, you can simply do something like this:
-
-    export METERIAN_API_TOKEN=a902874d-50f2-464f-8707-780cd5f669a3
-(no, this is not a real token eheh!)
+`pipenv run python search_in_projects.py --key=security.locations --value=.ipynb --env=qa --domain=meterian.com --output=$(pwd)/../qa.notebooks.json --languages=python`
 
 
-## How to use
+- key indicates a set of keys to look for in the report. The last key is the one that will be used to collect data. The other values are used to indicate where in the report to look for the data.
+- value indicates the value to use to filter the results of the lookup. If no value is specified, then all the results will be returned.
+- output is used to specify the output file. 
+- languages is used to specify a list of comma separated languages to consider in the lookup. If no languages are specified, then all the languages will be used. 
 
-First of all run `pipenv install --python 3` to setup the virtual environment.
-**This script only works with python3**
-
-Then launch the generator `pipenv run python generate_bible.py [Options]`
-
-## The script option
-|Option|Required|Description|
-|------|--------|-----------|
-|`--tag=$TAG_NAME` | **Yes** | Specify the tag to which all the projects are bound |
-|`--output=/path/to/bible.json` | No | Specify the path where the bible json should be generated. If not specified the file will be generated under /tmp |
-|`--debug` | No | Set the log level to DEBUG |
-
-## Output
-
-The output file presents two sections:
-- _status
-- components
-- licenses
-
-The `_status` field indicates whether all the bibles were processed. 
-`"_status": "ok"` indicates that all the bibles were processed correctly
-`"_status": "partial"` indicates that the script was not able to process one or more bibles
-
-The `components` section contains all the components, with respective licenses, categorized by language.
-
-The `licenses` section contains all the licenses listed in all the processed bibles.
+- use `METERIAN_API_TOKEN` to specify the Authorization Bearer. This script will not work with authentication tokens.
