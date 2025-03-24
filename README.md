@@ -25,7 +25,7 @@ Then launch the generator `pipenv run python generate_bible.py [Options]`
 |Option|Required|Description|
 |------|--------|-----------|
 |`--tag=your-tag-name` | **Yes** | Specify the tag to which all the projects are bound |
-|`--output=/path/to/bible.json` | No | Specify the path where the bible json should be generated. If not specified the file will be generated under /tmp |
+|`--output=/path/to/bible.json` | No | Specify the path where the bible JSON file should be generated. If not specified the file will be generated under /tmp |
 |`--debug` | No | Set the log level to DEBUG |
 
 ### Output
@@ -49,13 +49,14 @@ Then launch the generator `pipenv run python generate_bible.py [Options]`
 ### The script option
 |Option|Required|Description|
 |------|--------|-----------|
-|`--tag=your-tag-name` | **Yes** | Specify the tag to which all the projects are bound |
+|`--tag=your-tag-name` | **Yes** | Specify the tag to which all the projects are bound ('*' means all projects) |
 |`--output=/path/to/folder` | **Yes** | Specify the folder where the reports should be generated.|
+|`--no-overwrite` | No | If specified the system will skip when a bible report is already present in the folder.|
 |`--debug` | No | Set the log level to DEBUG |
 
 ### Output
 
 The folder will present three files for each project:
-- the Meterian bible report in json format, ending with '.bible.json"
+- the Meterian bible report in JSON format, ending with '.bible.json"
 - the Meterian project report in PDF format, ending with '.pdf"
-- the CycloneDX report in json format, ending with '.cdx.json"
+- the CycloneDX report in JSON format, ending with '.cdx.json"

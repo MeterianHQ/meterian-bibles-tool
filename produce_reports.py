@@ -36,13 +36,13 @@ def apply_logging_settings():
 
 
 def parse_args(args):
-    global tag, output, env, log_level, no_merge
+    global tag, output, env, log_level, overwrite
 
     tag = None
     output = None
     env = "www"
     log_level = "INFO"
-    no_merge = False
+    overwrite = True
 
     # Process each argument (skipping the script name at args[0])
     for arg in args[1:]:
@@ -56,6 +56,8 @@ def parse_args(args):
                 env = "www"
         elif arg == "--debug":
             log_level = "DEBUG"
+        elif arg == "--no-overwrite":
+            overwrite = False
         else:
             print("Unexpected parameter: " + arg)
             sys.exit(1)
@@ -105,12 +107,17 @@ def store_reports(bibles_getter, project_uuids):
         count = count + 1
         print(f"Preparing report {count} of {len(project_uuids)}")
 
-        bibles_getter.prepare_bible(project_uuid)
+        project_info = project_getter.get_project_info(project_uuid)
+        project_name = project_getter.parse_project_url(project_info)
+        name = re.sub(r'[<>:"/\\|?*]', '_', project_name)
 
-        bible = bibles_getter.get_bible(project_uuid)
+        output_file = os.path.join(output, f"{name}.bible.json")
+        if overwrite == False and os.path.exists(output_file):
+            print(f"Skipping report for project '{name}' as {output_file} exists\n")
+            continue
         
-        name = bible["project"]["name"]
-        name = re.sub(r'[<>:"/\\|?*]', '_', name)
+        bibles_getter.prepare_bible_now(project_uuid, project_name)
+        bible = bibles_getter.get_bible(project_uuid)
 
         output_file = store_bible_onfs(bible, name)
         output_file = store_cyclonedx_onfs(bibles_getter, project_uuid, name)
@@ -155,8 +162,11 @@ if __name__ == "__main__":
 
     try:
         project_getter = ProjectsGetter(meterian_token, env)
-        project_uuids = project_getter.get(tag)
-        print(f"Found {len(project_uuids)} projects\n")
+        if "*" == tag:
+            project_uuids = project_getter.get_all()
+        else:
+            project_uuids = project_getter.get(tag)
+        print(f"Found {len(project_uuids)} projects for tag '{tag}'\n")
 
         bibles_getter = BiblesGetter(project_getter, meterian_token, env)
         store_reports(bibles_getter, project_uuids)

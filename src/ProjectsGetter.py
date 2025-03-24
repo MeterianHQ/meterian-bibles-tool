@@ -8,6 +8,13 @@ class ProjectsGetter:
         self.meterian_token = meterian_token
         self.env = env
 
+    def get_all(self):
+        print("Getting all account projects")
+        projects_request = requests.get("https://"+self.env+".meterian.com/api/v1/accounts/me/projects", headers={"Authorization": "token "+self.meterian_token})
+        projects = projects_request.json()  
+        project_uuids = [project["uuid"] for project in projects]
+        return  project_uuids
+
     def get(self, tag):
         if not tag or len(tag)==0:
             raise ValueError("Tag invalid or not specified")

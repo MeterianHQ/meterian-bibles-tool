@@ -89,7 +89,11 @@ class BiblesGetter:
 
     def prepare_bible(self, uuid):
         project_info = self.project_getter.get_project_info(uuid)
-        project_url = self.project_getter.parse_project_url(project_info)
+        project_name = self.project_getter.parse_project_url(project_info)
+        return self.prepare_bible_now(uuid, project_name)
+    
+    
+    def prepare_bible_now(self, uuid, project_name):
         gen_id = self.ask_bible_generation(uuid)
         ready = False
         wait_feedback = "       "
@@ -97,7 +101,7 @@ class BiblesGetter:
         while not ready:
             if wait_feedback==".....":
                 wait_feedback= "       "
-            print("Waiting for bible content to be generated on '"+project_url+"'"+wait_feedback, end="\r")
+            print("Waiting for bible content to be generated on '"+project_name+"'"+wait_feedback, end="\r")
             if wait_feedback == "       ":
                 wait_feedback= ""
             wait_feedback+="."
@@ -107,5 +111,4 @@ class BiblesGetter:
                 i=0
             time.sleep(1.5)
         print()
-        
-        return project_url
+        return project_name
