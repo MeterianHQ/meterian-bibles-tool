@@ -11,7 +11,7 @@ class ProjectsGetter:
     def get(self, tag):
         if not tag or len(tag)==0:
             raise ValueError("Tag invalid or not specified")
-        print("Getting projects linked to tag "+tag)
+        print("Getting projects linked to tag '"+tag+"'")
         tag_info_request = requests.get("https://"+self.env+".meterian.com/api/v1/accounts/me/tags/"+tag, headers={"Authorization": "token "+self.meterian_token})
         tag_info = tag_info_request.json()
         return tag_info["projects"]

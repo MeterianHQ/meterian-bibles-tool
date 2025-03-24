@@ -56,24 +56,18 @@ def parse_args(args):
                 env = "www"
         elif arg == "--debug":
             log_level = "DEBUG"
-        elif arg == "--no-merge":
-            no_merge = True
         else:
             print("Unexpected parameter: " + arg)
             sys.exit(1)
 
     if tag is None or len(tag) == 0:
-        print("Tag not specified. Use `--tag=$TAG` to specify a tag.")
+        print("Tag not specified. Use `--tag=mytag` to specify a tag (use '*' for all projects)")
         sys.exit(1)
         
     # Set default output based on merge behavior
     if output is None or len(output) == 0:
-        if no_merge:
-            output = os.path.join("/tmp", "meterian." + tag + ".bibles")
-            print("No output folder specified. The bibles will be saved @ " + output)
-        else:
-            output = os.path.join("/tmp", "meterian." + tag + ".bible.json")
-            print("No output has been specified. The merged bible will be created @ " + output)
+        print("Output not specified. Use `--output=/path/to/folder` to specify where the reports are generated")
+        sys.exit(1)
 
 
 def parse_env_variables(vars):
@@ -90,8 +84,6 @@ def parse_env_variables(vars):
 
 
 def store_bibles(bibles):
-    if not os.path.exists(output):
-        os.makedirs(output)
 
     bibles_list = bibles["bibles"]
     for bible in bibles_list:
@@ -104,32 +96,70 @@ def store_bibles(bibles):
         print(f"Saved bible for project '{name}' to {output_file}")
         
         
-def merge_bibles(bibles):
-    merged_bible = bibles_merger.merge(bibles)
-    bibles_merger.dump(merged_bible)
-    print(f"Merged bible saved to {output}")
+def store_reports(bibles_getter, project_uuids):
+    if not os.path.exists(output):
+        os.makedirs(output)
+
+    count = 0
+    for project_uuid in project_uuids:
+        count = count + 1
+        print(f"Preparing report {count} of {len(project_uuids)}")
+
+        bibles_getter.prepare_bible(project_uuid)
+
+        bible = bibles_getter.get_bible(project_uuid)
+        
+        name = bible["project"]["name"]
+        name = re.sub(r'[<>:"/\\|?*]', '_', name)
+
+        output_file = store_bible_onfs(bible, name)
+        output_file = store_cyclonedx_onfs(bibles_getter, project_uuid, name)
+        output_file = store_pdfreport_onfs(bibles_getter, project_uuid, name)
+        
+        print()
+        
+    print(f"All reports saved to {output}")
+
+def store_cyclonedx_onfs(bibles_getter, project_uuid, name):
+    bible = bibles_getter.get_cyclonedx(project_uuid)
+    output_file = os.path.join(output, f"{name}.cdx.json")
+    with open(output_file, "w") as f:
+        json.dump(bible, f, indent=4)
+
+    print(f"Saved cyclonedx report for project '{name}' to {output_file}")
+    return output_file
+
+    None
+    
+def store_pdfreport_onfs(bibles_getter, project_uuid, name):
+    output_file = os.path.join(output, f"{name}.pdf")
+    bibles_getter.get_pdfreport(project_uuid, output_file)
+
+    print(f"Saved PDF report for project '{name}' to {output_file}")
+
+def store_bible_onfs(bible, name):
+    output_file = os.path.join(output, f"{name}.bible.json")
+    with open(output_file, "w") as f:
+        json.dump(bible, f, indent=4)
+
+    print(f"Saved bible report for project '{name}' to {output_file}")
+    return output_file
 
 
 if __name__ == "__main__":
-    print("Meterian - Bibles Tool")
-    print()
+    print("Meterian - Report Producer")
     parse_env_variables(os.environ)
     parse_args(sys.argv)
     apply_logging_settings()
     print()
 
-    project_getter = ProjectsGetter(meterian_token, env)
-    bibles_getter = BiblesGetter(project_getter, meterian_token, env)
-    bibles_merger = BiblesMerger(output)
-
     try:
-        projects = project_getter.get(tag)
-        bibles = bibles_getter.get_all(projects)
-        
-        if no_merge:
-            store_bibles(bibles)
-        else:
-            merge_bibles(bibles)
+        project_getter = ProjectsGetter(meterian_token, env)
+        project_uuids = project_getter.get(tag)
+        print(f"Found {len(project_uuids)} projects\n")
+
+        bibles_getter = BiblesGetter(project_getter, meterian_token, env)
+        store_reports(bibles_getter, project_uuids)
             
     except Exception as e:
         print(e)
