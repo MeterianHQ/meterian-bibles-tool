@@ -8,6 +8,7 @@ import os
 import logging
 import json  
 import re
+import traceback
 
 
 def apply_logging_settings():
@@ -108,6 +109,10 @@ def store_reports(bibles_getter, project_uuids):
         print(f"Preparing report {count} of {len(project_uuids)}")
 
         project_info = project_getter.get_project_info(project_uuid)
+        if project_info == None:
+            print(f"Skipping report for project '{project_uuid}' as no info exists\n")
+            continue
+
         project_name = project_getter.parse_project_url(project_info)
         name = re.sub(r'[<>:"/\\|?*]', '_', project_name)
 
@@ -115,14 +120,20 @@ def store_reports(bibles_getter, project_uuids):
         if overwrite == False and os.path.exists(output_file):
             print(f"Skipping report for project '{name}' as {output_file} exists\n")
             continue
-        
-        bibles_getter.prepare_bible_now(project_uuid, project_name)
-        bible = bibles_getter.get_bible(project_uuid)
+            
+        try:
+            bibles_getter.prepare_bible_now(project_uuid, project_name)
+            bible = bibles_getter.get_bible(project_uuid)
 
-        output_file = store_bible_onfs(bible, name)
-        output_file = store_cyclonedx_onfs(bibles_getter, project_uuid, name)
-        output_file = store_pdfreport_onfs(bibles_getter, project_uuid, name)
-        
+            output_file = store_bible_onfs(bible, name)
+            output_file = store_cyclonedx_onfs(bibles_getter, project_uuid, name)
+            output_file = store_pdfreport_onfs(bibles_getter, project_uuid, name)
+        except Exception as e:
+            print(f"Skipping report for project '{name}' because of a system error")
+            traceback.print_exc()
+            os.path.exists(output_file) and os.remove(output_file)
+            continue        
+
         print()
         
     print(f"All reports saved to {output}")

@@ -26,8 +26,9 @@ class ProjectsGetter:
     def get_project_info(self, uuid):
         request = requests.get("https://"+self.env+".meterian.io/api/v1/projects/"+uuid,headers={"Authorization": "token "+self.meterian_token})
         if request.status_code != 200:
+            log.info("Could not get info for project "+uuid+": "+str(request.status_code))
             log.debug(request.text)
-            raise ValueError("Could not get info for project "+uuid)
+            return None
         project_info = request.json()
         return project_info
 

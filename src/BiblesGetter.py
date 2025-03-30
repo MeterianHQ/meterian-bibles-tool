@@ -89,6 +89,9 @@ class BiblesGetter:
 
     def prepare_bible(self, uuid):
         project_info = self.project_getter.get_project_info(uuid)
+        if project_info == None:
+            raise ValueError("Could not get info for project "+uuid)
+
         project_name = self.project_getter.parse_project_url(project_info)
         return self.prepare_bible_now(uuid, project_name)
     
